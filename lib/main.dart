@@ -13,6 +13,7 @@ class MyApp extends StatelessWidget {
       title: 'Harbour.Space',
       theme: ThemeData(
         primarySwatch: Colors.purple,
+        // textTheme: GoogleFonts.poppinsTextTheme(),
       ),
       home: HomePage(),
     );
