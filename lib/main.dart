@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hs_app/login_page.dart';
 
 import 'home_page.dart';
 
@@ -15,7 +16,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.purple,
         // textTheme: GoogleFonts.poppinsTextTheme(),
       ),
-      home: HomePage(),
+      home: LoginPage(),
     );
   }
 }

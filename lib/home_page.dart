@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hs_app/post_repository.dart';
 
 class HomePage extends StatelessWidget {
   @override
@@ -31,13 +32,18 @@ class HomePage extends StatelessWidget {
   }
 }
 
-class StoryWidget extends StatelessWidget {
+class StoryWidget extends StatefulWidget {
   final Axis direction;
 
   StoryWidget({
     required this.direction,
   });
 
+  @override
+  _StoryWidgetState createState() => _StoryWidgetState();
+}
+
+class _StoryWidgetState extends State<StoryWidget> {
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -50,8 +56,7 @@ class StoryWidget extends StatelessWidget {
         SizedBox(height: 24),
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
-          child: Flex(
-            direction: direction,
+          child: Row(
             mainAxisSize: MainAxisSize.max,
             children: [
               StoryElement(),
@@ -101,19 +106,32 @@ class FeedWidget extends StatelessWidget {
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
         SizedBox(height: 16),
-        PostWidget(),
-        PostWidget(),
-        PostWidget(),
-        PostWidget(),
+        StreamBuilder<List<Post>>(
+          stream: MockPostRepository().watchAllPosts(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return CircularProgressIndicator();
+            }
+            final data = snapshot.data;
+            if (data != null) {
+              return Column(
+                children: data.map((e) => PostWidget(post: e)).toList(),
+              );
+            }
+            return Text('Unexpected Error!');
+          },
+        )
       ],
     );
   }
 }
 
 class PostWidget extends StatelessWidget {
+  final Post post;
+
   const PostWidget({
-    Key? key,
-  }) : super(key: key);
+    required this.post,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -140,7 +158,9 @@ class PostWidget extends StatelessWidget {
               SizedBox(height: 16),
               AspectRatio(
                 aspectRatio: 1,
-                child: Container(color: Colors.grey),
+                child: Container(
+                  color: post.color,
+                ),
               ),
               Row(
                 children: [
