@@ -1,33 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:hs_app/auth_repository.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class LoginPage extends StatefulWidget {
-  final AuthRepository authRepository = MockAuthRepository();
-  @override
-  _LoginPageState createState() => _LoginPageState();
-}
+import 'auth_repository.dart';
 
-class _LoginPageState extends State<LoginPage> {
-  bool waiting = false;
-
+class LoginPage extends HookWidget {
   @override
   Widget build(BuildContext context) {
+    final waiting = useState(false);
+    final authRepository = useProvider(authRepositoryProvider);
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Login'),
       ),
       body: Center(
-        child: waiting
+        child: waiting.value
             ? CircularProgressIndicator()
             : ElevatedButton(
                 onPressed: () async {
-                  setState(() {
-                    waiting = true;
-                  });
-                  final result = await widget.authRepository.login();
-                  setState(() {
-                    waiting = false;
-                  });
+                  print('I am being pressed!');
+                  waiting.value = true;
+                  final result = await authRepository.login();
+                  waiting.value = false;
                   if (result) {
                     print('you logged in!');
                   } else {

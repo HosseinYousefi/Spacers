@@ -1,3 +1,5 @@
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+
 abstract class AuthRepository {
   Future<bool> login();
   // Future<bool> logout();
@@ -10,3 +12,5 @@ class MockAuthRepository implements AuthRepository {
     return true;
   }
 }
+
+final authRepositoryProvider = Provider((_) => MockAuthRepository());

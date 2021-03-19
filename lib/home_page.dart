@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:hs_app/home_page_bloc.dart';
 import 'package:hs_app/post_repository.dart';
+import 'package:yeet/yeet.dart';
 
 class HomePage extends StatelessWidget {
   @override
@@ -49,6 +53,11 @@ class _StoryWidgetState extends State<StoryWidget> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        ElevatedButton(
+            onPressed: () {
+              context.yeet('/demo');
+            },
+            child: Text('Demo...')),
         Text(
           'Discovery',
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
@@ -95,9 +104,11 @@ class StoryElement extends StatelessWidget {
 
 const horizontalPadding = SizedBox(width: 16);
 
-class FeedWidget extends StatelessWidget {
+class FeedWidget extends HookWidget {
   @override
   Widget build(BuildContext context) {
+    final state = useProvider(homePageBlocProvider.state);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -106,27 +117,18 @@ class FeedWidget extends StatelessWidget {
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
         SizedBox(height: 16),
-        StreamBuilder<List<Post>>(
-          stream: MockPostRepository().watchAllPosts(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return CircularProgressIndicator();
-            }
-            final data = snapshot.data;
-            if (data != null) {
-              return Column(
-                children: data.map((e) => PostWidget(post: e)).toList(),
-              );
-            }
-            return Text('Unexpected Error!');
-          },
-        )
+        if (state.isLoading)
+          CircularProgressIndicator()
+        else
+          Column(
+            children: state.posts.map((e) => PostWidget(post: e)).toList(),
+          ),
       ],
     );
   }
 }
 
-class PostWidget extends StatelessWidget {
+class PostWidget extends HookWidget {
   final Post post;
 
   const PostWidget({
@@ -135,6 +137,8 @@ class PostWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final homePageBloc = useProvider(homePageBlocProvider);
+
     return ConstrainedBox(
       constraints: BoxConstraints(maxWidth: 500),
       child: Padding(
@@ -167,16 +171,24 @@ class PostWidget extends StatelessWidget {
                   IconButton(
                     icon: Icon(
                       Icons.arrow_circle_up_sharp,
-                      color: Colors.grey,
+                      color: post.likeStatus == LikeStatus.liked
+                          ? Colors.purple
+                          : Colors.grey,
                     ),
-                    onPressed: () {},
+                    onPressed: () async {
+                      homePageBloc.likePressed(post.id);
+                    },
                   ),
                   IconButton(
                     icon: Icon(
                       Icons.arrow_circle_down_sharp,
-                      color: Colors.grey,
+                      color: post.likeStatus == LikeStatus.disliked
+                          ? Colors.purple
+                          : Colors.grey,
                     ),
-                    onPressed: () {},
+                    onPressed: () async {
+                      homePageBloc.dislikePressed(post.id);
+                    },
                   ),
                   Spacer(),
                   IconButton(
