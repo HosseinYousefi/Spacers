@@ -53,11 +53,6 @@ class _StoryWidgetState extends State<StoryWidget> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        ElevatedButton(
-            onPressed: () {
-              context.yeet('/demo');
-            },
-            child: Text('Demo...')),
         Text(
           'Discovery',
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),

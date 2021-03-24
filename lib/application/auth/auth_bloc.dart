@@ -6,7 +6,11 @@ import 'auth_state.dart';
 class AuthBloc extends StateNotifier<AuthState> {
   final AuthRepo authRepo;
 
-  AuthBloc(this.authRepo) : super(AuthState.unauthenticated());
+  AuthBloc(this.authRepo)
+      : super(AuthState.unauthenticated(
+          userName: '',
+          password: '',
+        ));
 
   Future<void> loginButtonPressed() async {
     state = AuthState.loading();
@@ -14,6 +18,31 @@ class AuthBloc extends StateNotifier<AuthState> {
     failureOrUser.fold(
       (failure) => state = AuthState.failed(failure: failure),
       (user) => state = AuthState.authenticated(user: user),
+    );
+  }
+
+  void userNameChanged(String userName) {
+    state.maybeMap(
+      unauthenticated: (value) {
+        String? errorMessage;
+        if (userName.length > 10) {
+          errorMessage = 'The password is too long.';
+        }
+        state = value.copyWith(
+          userName: userName,
+          userError: errorMessage,
+        );
+      },
+      orElse: () {},
+    );
+  }
+
+  void passwordChanged(String password) {
+    state.maybeMap(
+      unauthenticated: (value) {
+        state = value.copyWith(password: password);
+      },
+      orElse: () {},
     );
   }
 }
