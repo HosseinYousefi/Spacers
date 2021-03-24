@@ -5,6 +5,7 @@ import 'package:hs_app/application/auth/auth_bloc.dart';
 import 'package:hs_app/auth_repository.dart';
 import 'package:hs_app/demo_page.dart';
 import 'package:hs_app/presentation/auth/auth_view.dart';
+import 'package:hs_app/presentation/player/player_view.dart';
 import 'package:yeet/yeet.dart';
 
 import 'home_page.dart';
