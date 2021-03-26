@@ -1,15 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:hs_app/home_page_bloc.dart';
-import 'package:hs_app/post_repository.dart';
+import 'package:hs_app/application/auth/auth_bloc.dart';
+import 'package:hs_app/application/auth/auth_state.dart';
+import 'package:hs_app/application/posts/posts_bloc.dart';
+import 'package:hs_app/domain/auth/auth_repo.dart';
+import 'package:hs_app/domain/db/db_repo.dart';
+import 'package:hs_app/domain/posts/posts_repo.dart';
 import 'package:yeet/yeet.dart';
 
-class HomePage extends StatelessWidget {
+import 'domain/posts/post.dart';
+
+class HomePage extends HookWidget {
   @override
   Widget build(BuildContext context) {
+    final authRepo = useProvider(authRepoProvider);
+    final postsBloc = useProvider(postsBlocProvider);
     return Scaffold(
       appBar: AppBar(
+        actions: [
+          IconButton(
+            icon: Icon(Icons.logout),
+            onPressed: () {
+              authRepo.logout();
+            },
+          ),
+        ],
         title: Text('Harbour.Space App'),
       ),
       body: LayoutBuilder(
@@ -23,9 +39,21 @@ class HomePage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(height: 36),
-                  StoryWidget(direction: Axis.horizontal),
+                  StoryWidget(),
                   SizedBox(height: 36),
                   FeedWidget(),
+                  TextField(
+                    onChanged: (value) {
+                      postsBloc.postContentChanged(value);
+                    },
+                    decoration: InputDecoration(hintText: 'Post'),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.send),
+                    onPressed: () {
+                      postsBloc.postButtonPressed();
+                    },
+                  ),
                 ],
               ),
             ),
@@ -36,26 +64,29 @@ class HomePage extends StatelessWidget {
   }
 }
 
-class StoryWidget extends StatefulWidget {
-  final Axis direction;
-
-  StoryWidget({
-    required this.direction,
-  });
-
-  @override
-  _StoryWidgetState createState() => _StoryWidgetState();
-}
-
-class _StoryWidgetState extends State<StoryWidget> {
+class StoryWidget extends HookWidget {
   @override
   Widget build(BuildContext context) {
+    final dbRepo = useProvider(dbRepoProvider);
+    final authState = useProvider(authBlocProvider.state);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Discovery',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        StreamBuilder(
+          stream: dbRepo.watchName((authState as Authenticated).user.id),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return Text(
+                'Good Morning ${snapshot.data}',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              );
+            } else {
+              return Text(
+                'Good Morning',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              );
+            }
+          },
         ),
         SizedBox(height: 24),
         SingleChildScrollView(
@@ -102,8 +133,7 @@ const horizontalPadding = SizedBox(width: 16);
 class FeedWidget extends HookWidget {
   @override
   Widget build(BuildContext context) {
-    final state = useProvider(homePageBlocProvider.state);
-
+    final state = useProvider(postsBlocProvider.state);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -112,7 +142,7 @@ class FeedWidget extends HookWidget {
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
         SizedBox(height: 16),
-        if (state.isLoading)
+        if (state.posts.isEmpty)
           CircularProgressIndicator()
         else
           Column(
@@ -132,70 +162,26 @@ class PostWidget extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final homePageBloc = useProvider(homePageBlocProvider);
-
     return ConstrainedBox(
       constraints: BoxConstraints(maxWidth: 500),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 10.0),
         child: Card(
           elevation: 5,
-          child: Column(
-            children: [
-              SizedBox(height: 16),
-              Row(
-                children: [
-                  horizontalPadding,
-                  CircleAvatar(backgroundColor: Colors.grey, radius: 16),
-                  horizontalPadding,
-                  Text('Name'),
-                  Spacer(),
-                  Text('12h'),
-                  horizontalPadding,
-                ],
-              ),
-              SizedBox(height: 16),
-              AspectRatio(
-                aspectRatio: 1,
-                child: Container(
-                  color: post.color,
+          child: Center(
+            child: Column(
+              children: [
+                Text(
+                  post.authorName,
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
-              ),
-              Row(
-                children: [
-                  IconButton(
-                    icon: Icon(
-                      Icons.arrow_circle_up_sharp,
-                      color: post.likeStatus == LikeStatus.liked
-                          ? Colors.purple
-                          : Colors.grey,
-                    ),
-                    onPressed: () async {
-                      homePageBloc.likePressed(post.id);
-                    },
-                  ),
-                  IconButton(
-                    icon: Icon(
-                      Icons.arrow_circle_down_sharp,
-                      color: post.likeStatus == LikeStatus.disliked
-                          ? Colors.purple
-                          : Colors.grey,
-                    ),
-                    onPressed: () async {
-                      homePageBloc.dislikePressed(post.id);
-                    },
-                  ),
-                  Spacer(),
-                  IconButton(
-                    icon: Icon(
-                      Icons.comment,
-                      color: Colors.grey,
-                    ),
-                    onPressed: () {},
-                  ),
-                ],
-              ),
-            ],
+                SizedBox(height: 20),
+                Text(
+                  post.content,
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
+                ),
+              ],
+            ),
           ),
         ),
       ),

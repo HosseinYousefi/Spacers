@@ -7,16 +7,9 @@ part 'auth_state.freezed.dart';
 
 @freezed
 abstract class AuthState with _$AuthState {
-  const factory AuthState.unauthenticated({
-    required String userName,
-    required String password,
-    String? userError,
-  }) = _Unathenticated;
-  const factory AuthState.failed({
-    required AuthFailure failure,
-  }) = _Failed;
-  const factory AuthState.loading() = _Loading;
+  const factory AuthState.unauthenticated() = _Unathenticated;
   const factory AuthState.authenticated({
     required User user,
   }) = Authenticated;
+  const factory AuthState.loading() = _Loading;
 }

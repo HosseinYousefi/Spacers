@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:hs_app/application/auth/auth_bloc.dart';
+import 'package:hs_app/application/auth/login_bloc.dart';
 import 'package:hs_app/common/hs_colors.dart';
 import 'package:yeet/yeet.dart';
 
@@ -9,7 +10,8 @@ class AuthView extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final authState = useProvider(authBlocProvider.state);
-    final authBloc = useProvider(authBlocProvider);
+    final loginState = useProvider(loginBlocProvider.state);
+    final loginBloc = useProvider(loginBlocProvider);
     // ternary operator:
     // condition ? ifitstrue : ifitsfalse
     return Scaffold(
@@ -18,20 +20,13 @@ class AuthView extends HookWidget {
           Image.asset('assets/HS.png'),
           authState.when(
             loading: () => Center(child: CircularProgressIndicator()),
-            failed: (failure) => Center(
-              child: Text(failure.when(
-                wrongPassword: () => 'Wrong Password!',
-                userNotFound: () => 'User not found!',
-                generalAuthFailure: () => 'Server error, please try again!',
-              )),
-            ),
             authenticated: (user) {
               Future.delayed(Duration(milliseconds: 300)).then((_) {
                 context.yeet('/home');
               });
-              return Center(child: Text('Welcome ${user.userName}'));
+              return Center(child: Text('Welcome ${user.id}'));
             },
-            unauthenticated: (userName, password, userError) => Center(
+            unauthenticated: () => Center(
               child: Padding(
                 padding: const EdgeInsets.all(24.0),
                 child: Column(
@@ -39,19 +34,19 @@ class AuthView extends HookWidget {
                   children: [
                     TextField(
                       onChanged: (value) {
-                        authBloc.userNameChanged(value);
+                        loginBloc.emailChanged(value);
                       },
                       decoration: InputDecoration(
-                        errorText: userError,
+                        errorText: loginState.emailError,
                         border: OutlineInputBorder(),
-                        hintText: 'Username',
+                        hintText: 'Email',
                       ),
                     ),
                     SizedBox(height: 24),
                     TextField(
                       obscureText: true,
                       onChanged: (value) {
-                        authBloc.passwordChanged(value);
+                        loginBloc.passwordChanged(value);
                       },
                       decoration: InputDecoration(
                         border: OutlineInputBorder(),
@@ -61,7 +56,7 @@ class AuthView extends HookWidget {
                     SizedBox(height: 24),
                     ElevatedButton(
                       onPressed: () {
-                        authBloc.loginButtonPressed();
+                        loginBloc.loginPressed();
                       },
                       style: ButtonStyle(
                         backgroundColor: MaterialStateProperty.resolveWith(
@@ -69,6 +64,18 @@ class AuthView extends HookWidget {
                         ),
                       ),
                       child: Text('Sign in'),
+                    ),
+                    SizedBox(height: 24),
+                    ElevatedButton(
+                      onPressed: () {
+                        loginBloc.registerPressed();
+                      },
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.resolveWith(
+                          (_) => HSColors.mainColor,
+                        ),
+                      ),
+                      child: Text('Register'),
                     ),
                     SizedBox(height: 24),
                     TextButton(
