@@ -20,12 +20,14 @@ class _$LoginStateTearOff {
       {required String email,
       required String password,
       String? emailError,
-      String? passwordError}) {
+      String? passwordError,
+      required bool hasSubmitted}) {
     return _LoginState(
       email: email,
       password: password,
       emailError: emailError,
       passwordError: passwordError,
+      hasSubmitted: hasSubmitted,
     );
   }
 }
@@ -39,6 +41,7 @@ mixin _$LoginState {
   String get password => throw _privateConstructorUsedError;
   String? get emailError => throw _privateConstructorUsedError;
   String? get passwordError => throw _privateConstructorUsedError;
+  bool get hasSubmitted => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $LoginStateCopyWith<LoginState> get copyWith =>
@@ -54,7 +57,8 @@ abstract class $LoginStateCopyWith<$Res> {
       {String email,
       String password,
       String? emailError,
-      String? passwordError});
+      String? passwordError,
+      bool hasSubmitted});
 }
 
 /// @nodoc
@@ -71,6 +75,7 @@ class _$LoginStateCopyWithImpl<$Res> implements $LoginStateCopyWith<$Res> {
     Object? password = freezed,
     Object? emailError = freezed,
     Object? passwordError = freezed,
+    Object? hasSubmitted = freezed,
   }) {
     return _then(_value.copyWith(
       email: email == freezed
@@ -89,6 +94,10 @@ class _$LoginStateCopyWithImpl<$Res> implements $LoginStateCopyWith<$Res> {
           ? _value.passwordError
           : passwordError // ignore: cast_nullable_to_non_nullable
               as String?,
+      hasSubmitted: hasSubmitted == freezed
+          ? _value.hasSubmitted
+          : hasSubmitted // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 }
@@ -103,7 +112,8 @@ abstract class _$LoginStateCopyWith<$Res> implements $LoginStateCopyWith<$Res> {
       {String email,
       String password,
       String? emailError,
-      String? passwordError});
+      String? passwordError,
+      bool hasSubmitted});
 }
 
 /// @nodoc
@@ -122,6 +132,7 @@ class __$LoginStateCopyWithImpl<$Res> extends _$LoginStateCopyWithImpl<$Res>
     Object? password = freezed,
     Object? emailError = freezed,
     Object? passwordError = freezed,
+    Object? hasSubmitted = freezed,
   }) {
     return _then(_LoginState(
       email: email == freezed
@@ -140,6 +151,10 @@ class __$LoginStateCopyWithImpl<$Res> extends _$LoginStateCopyWithImpl<$Res>
           ? _value.passwordError
           : passwordError // ignore: cast_nullable_to_non_nullable
               as String?,
+      hasSubmitted: hasSubmitted == freezed
+          ? _value.hasSubmitted
+          : hasSubmitted // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 }
@@ -150,7 +165,8 @@ class _$_LoginState implements _LoginState {
       {required this.email,
       required this.password,
       this.emailError,
-      this.passwordError});
+      this.passwordError,
+      required this.hasSubmitted});
 
   @override
   final String email;
@@ -160,10 +176,12 @@ class _$_LoginState implements _LoginState {
   final String? emailError;
   @override
   final String? passwordError;
+  @override
+  final bool hasSubmitted;
 
   @override
   String toString() {
-    return 'LoginState(email: $email, password: $password, emailError: $emailError, passwordError: $passwordError)';
+    return 'LoginState(email: $email, password: $password, emailError: $emailError, passwordError: $passwordError, hasSubmitted: $hasSubmitted)';
   }
 
   @override
@@ -180,7 +198,10 @@ class _$_LoginState implements _LoginState {
                     .equals(other.emailError, emailError)) &&
             (identical(other.passwordError, passwordError) ||
                 const DeepCollectionEquality()
-                    .equals(other.passwordError, passwordError)));
+                    .equals(other.passwordError, passwordError)) &&
+            (identical(other.hasSubmitted, hasSubmitted) ||
+                const DeepCollectionEquality()
+                    .equals(other.hasSubmitted, hasSubmitted)));
   }
 
   @override
@@ -189,7 +210,8 @@ class _$_LoginState implements _LoginState {
       const DeepCollectionEquality().hash(email) ^
       const DeepCollectionEquality().hash(password) ^
       const DeepCollectionEquality().hash(emailError) ^
-      const DeepCollectionEquality().hash(passwordError);
+      const DeepCollectionEquality().hash(passwordError) ^
+      const DeepCollectionEquality().hash(hasSubmitted);
 
   @JsonKey(ignore: true)
   @override
@@ -202,7 +224,8 @@ abstract class _LoginState implements LoginState {
       {required String email,
       required String password,
       String? emailError,
-      String? passwordError}) = _$_LoginState;
+      String? passwordError,
+      required bool hasSubmitted}) = _$_LoginState;
 
   @override
   String get email => throw _privateConstructorUsedError;
@@ -212,6 +235,8 @@ abstract class _LoginState implements LoginState {
   String? get emailError => throw _privateConstructorUsedError;
   @override
   String? get passwordError => throw _privateConstructorUsedError;
+  @override
+  bool get hasSubmitted => throw _privateConstructorUsedError;
   @override
   @JsonKey(ignore: true)
   _$LoginStateCopyWith<_LoginState> get copyWith =>
