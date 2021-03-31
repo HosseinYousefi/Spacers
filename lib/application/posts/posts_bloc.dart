@@ -1,12 +1,15 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:hs_app/application/auth/auth_bloc.dart';
+import 'package:hs_app/application/auth/auth_state.dart';
 import 'package:hs_app/application/posts/posts_state.dart';
 import 'package:hs_app/domain/posts/post.dart';
 import 'package:hs_app/domain/posts/posts_repo.dart';
 
 class PostsBloc extends StateNotifier<PostsState> {
   final PostsRepo postsRepo;
+  final Authenticated authState;
 
-  PostsBloc(List<Post> posts, this.postsRepo)
+  PostsBloc(List<Post> posts, this.postsRepo, this.authState)
       : super(PostsState(posts: posts, newPostContent: ''));
 
   void postContentChanged(String content) {
@@ -14,8 +17,8 @@ class PostsBloc extends StateNotifier<PostsState> {
   }
 
   void postButtonPressed() {
-    postsRepo.post('Hossein', 'dWiorOGf1gbCu9NKZ98VjuZQKXx1',
-        state.newPostContent, DateTime.now());
+    postsRepo.post(authState.user.name, authState.user.id, state.newPostContent,
+        DateTime.now());
   }
 }
 
@@ -25,17 +28,18 @@ final postsStreamProvider = StreamProvider<List<Post>>((ref) {
 });
 
 final postsBlocProvider = StateNotifierProvider<PostsBloc>((ref) {
+  final authState = ref.watch(authBlocProvider.state);
   final postsRepo = ref.watch(postsRepoProvider);
   final posts = ref.watch(postsStreamProvider);
   return posts.when(
     data: (data) {
       print(data);
-      return PostsBloc(data, postsRepo);
+      return PostsBloc(data, postsRepo, authState as Authenticated);
     },
-    loading: () => PostsBloc([], postsRepo),
+    loading: () => PostsBloc([], postsRepo, authState as Authenticated),
     error: (e, __) {
       print(e);
-      return PostsBloc([], postsRepo);
+      return PostsBloc([], postsRepo, authState as Authenticated);
     },
   );
 });

@@ -16,8 +16,12 @@ final _privateConstructorUsedError = UnsupportedError(
 class _$PostTearOff {
   const _$PostTearOff();
 
-  _Post call({required String authorName, required String content}) {
+  _Post call(
+      {required String id,
+      required String authorName,
+      required String content}) {
     return _Post(
+      id: id,
       authorName: authorName,
       content: content,
     );
@@ -29,6 +33,7 @@ const $Post = _$PostTearOff();
 
 /// @nodoc
 mixin _$Post {
+  String get id => throw _privateConstructorUsedError;
   String get authorName => throw _privateConstructorUsedError;
   String get content => throw _privateConstructorUsedError;
 
@@ -40,7 +45,7 @@ mixin _$Post {
 abstract class $PostCopyWith<$Res> {
   factory $PostCopyWith(Post value, $Res Function(Post) then) =
       _$PostCopyWithImpl<$Res>;
-  $Res call({String authorName, String content});
+  $Res call({String id, String authorName, String content});
 }
 
 /// @nodoc
@@ -53,10 +58,15 @@ class _$PostCopyWithImpl<$Res> implements $PostCopyWith<$Res> {
 
   @override
   $Res call({
+    Object? id = freezed,
     Object? authorName = freezed,
     Object? content = freezed,
   }) {
     return _then(_value.copyWith(
+      id: id == freezed
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
       authorName: authorName == freezed
           ? _value.authorName
           : authorName // ignore: cast_nullable_to_non_nullable
@@ -74,7 +84,7 @@ abstract class _$PostCopyWith<$Res> implements $PostCopyWith<$Res> {
   factory _$PostCopyWith(_Post value, $Res Function(_Post) then) =
       __$PostCopyWithImpl<$Res>;
   @override
-  $Res call({String authorName, String content});
+  $Res call({String id, String authorName, String content});
 }
 
 /// @nodoc
@@ -88,10 +98,15 @@ class __$PostCopyWithImpl<$Res> extends _$PostCopyWithImpl<$Res>
 
   @override
   $Res call({
+    Object? id = freezed,
     Object? authorName = freezed,
     Object? content = freezed,
   }) {
     return _then(_Post(
+      id: id == freezed
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
       authorName: authorName == freezed
           ? _value.authorName
           : authorName // ignore: cast_nullable_to_non_nullable
@@ -106,8 +121,11 @@ class __$PostCopyWithImpl<$Res> extends _$PostCopyWithImpl<$Res>
 
 /// @nodoc
 class _$_Post implements _Post {
-  const _$_Post({required this.authorName, required this.content});
+  const _$_Post(
+      {required this.id, required this.authorName, required this.content});
 
+  @override
+  final String id;
   @override
   final String authorName;
   @override
@@ -115,13 +133,15 @@ class _$_Post implements _Post {
 
   @override
   String toString() {
-    return 'Post(authorName: $authorName, content: $content)';
+    return 'Post(id: $id, authorName: $authorName, content: $content)';
   }
 
   @override
   bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other is _Post &&
+            (identical(other.id, id) ||
+                const DeepCollectionEquality().equals(other.id, id)) &&
             (identical(other.authorName, authorName) ||
                 const DeepCollectionEquality()
                     .equals(other.authorName, authorName)) &&
@@ -132,6 +152,7 @@ class _$_Post implements _Post {
   @override
   int get hashCode =>
       runtimeType.hashCode ^
+      const DeepCollectionEquality().hash(id) ^
       const DeepCollectionEquality().hash(authorName) ^
       const DeepCollectionEquality().hash(content);
 
@@ -142,9 +163,13 @@ class _$_Post implements _Post {
 }
 
 abstract class _Post implements Post {
-  const factory _Post({required String authorName, required String content}) =
-      _$_Post;
+  const factory _Post(
+      {required String id,
+      required String authorName,
+      required String content}) = _$_Post;
 
+  @override
+  String get id => throw _privateConstructorUsedError;
   @override
   String get authorName => throw _privateConstructorUsedError;
   @override

@@ -31,6 +31,7 @@ class PostsRepo {
         .snapshots()
         .map((snapshot) => snapshot.docs
             .map((doc) => Post(
+                  id: doc.id,
                   authorName: doc['author_name'],
                   content: doc['content'],
                 ))
