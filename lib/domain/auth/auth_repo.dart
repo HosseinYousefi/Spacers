@@ -6,6 +6,10 @@ import 'package:hs_app/infrastructure/auth/firebase_auth_service.dart';
 
 import 'user.dart';
 
+extension FirestoreX on firebase_auth.User {
+  String get name => email!.split('@').first;
+}
+
 class AuthRepo {
   final firebase_auth.FirebaseAuth firebaseAuth;
 
@@ -22,7 +26,7 @@ class AuthRepo {
       if (firebaseUser == null) {
         return left(GeneralAuthFailure());
       }
-      return right(User(id: firebaseUser.uid));
+      return right(User(id: firebaseUser.uid, name: firebaseUser.name));
     } catch (e) {
       print(e);
       return left(GeneralAuthFailure());
@@ -40,7 +44,7 @@ class AuthRepo {
       if (firebaseUser == null) {
         return left(GeneralAuthFailure());
       }
-      return right(User(id: firebaseUser.uid));
+      return right(User(id: firebaseUser.uid, name: firebaseUser.name));
     } catch (e) {
       print(e);
       return left(GeneralAuthFailure());
@@ -57,9 +61,8 @@ class AuthRepo {
   }
 
   Stream<User?> authStateChanges() {
-    return firebaseAuth
-        .authStateChanges()
-        .map((user) => user == null ? null : User(id: user.uid));
+    return firebaseAuth.authStateChanges().map(
+        (user) => user == null ? null : User(id: user.uid, name: user.name));
   }
 }
 

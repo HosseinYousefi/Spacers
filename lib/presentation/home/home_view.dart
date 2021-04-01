@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:yeet/yeet.dart';
 
 import '../../application/posts/posts_bloc.dart';
 import '../../domain/auth/auth_repo.dart';
@@ -103,39 +104,47 @@ class PostWidget extends HookWidget {
     final isLiked = useFuture(postsBloc.isLiked(post.id), initialData: false);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10.0),
-      child: Card(
-        elevation: 5,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Center(
-            child: Column(
-              children: [
-                Text(
-                  post.authorName,
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 20),
-                Text(
-                  post.content,
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
-                ),
-                Row(
+      child: GestureDetector(
+        onTap: () => context.yeet('/post/${post.id}'),
+        child: Hero(
+          tag: 'post ${post.id}',
+          child: Card(
+            elevation: 5,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Center(
+                child: Column(
                   children: [
-                    IconButton(
-                      icon: Icon(isLiked.data!
-                          ? Icons.favorite
-                          : Icons.favorite_border),
-                      onPressed: () {
-                        postsBloc.likeButtonPressed(post.id);
-                      },
+                    Text(
+                      post.authorName,
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
-                    SizedBox(
-                      width: 10,
+                    SizedBox(height: 20),
+                    Text(
+                      post.content,
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
                     ),
-                    Text(post.likes.toString()),
+                    Row(
+                      children: [
+                        IconButton(
+                          icon: Icon(isLiked.data!
+                              ? Icons.favorite
+                              : Icons.favorite_border),
+                          onPressed: () {
+                            postsBloc.likeButtonPressed(post.id);
+                          },
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Text(post.likes.toString()),
+                      ],
+                    ),
                   ],
-                )
-              ],
+                ),
+              ),
             ),
           ),
         ),
