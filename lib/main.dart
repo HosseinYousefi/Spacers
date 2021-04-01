@@ -9,6 +9,7 @@ import 'application/auth/auth_bloc.dart';
 import 'presentation/animation_page.dart';
 import 'presentation/home/home_view.dart';
 import 'presentation/auth/auth_view.dart';
+import 'presentation/paint_page.dart';
 
 final firebaseProvider =
     FutureProvider((_) async => await Firebase.initializeApp());

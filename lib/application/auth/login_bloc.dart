@@ -44,7 +44,6 @@ class LoginBloc extends StateNotifier<LoginState> {
     _submit();
     if (state.emailError == null && state.passwordError == null) {
       hsLogoController.loading();
-      await Future.delayed(Duration(seconds: 5));
       final result = await _authRepo.login(state.email, state.password);
       result.fold(
         (failure) {

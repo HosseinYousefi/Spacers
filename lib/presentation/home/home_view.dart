@@ -99,6 +99,8 @@ class PostWidget extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    final postsBloc = useProvider(postsBlocProvider);
+    final isLiked = useFuture(postsBloc.isLiked(post.id), initialData: false);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10.0),
       child: Card(
@@ -117,6 +119,22 @@ class PostWidget extends HookWidget {
                   post.content,
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
                 ),
+                Row(
+                  children: [
+                    IconButton(
+                      icon: Icon(isLiked.data!
+                          ? Icons.favorite
+                          : Icons.favorite_border),
+                      onPressed: () {
+                        postsBloc.likeButtonPressed(post.id);
+                      },
+                    ),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    Text(post.likes.toString()),
+                  ],
+                )
               ],
             ),
           ),

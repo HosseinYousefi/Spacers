@@ -13,9 +13,17 @@ class PostsBloc extends StateNotifier<PostsState> {
     state = state.copyWith(newPostContent: content);
   }
 
-  void postButtonPressed() {
-    postsRepo.post('Hossein', 'dWiorOGf1gbCu9NKZ98VjuZQKXx1',
+  Future<void> postButtonPressed() {
+    return postsRepo.post('Hossein', 'dWiorOGf1gbCu9NKZ98VjuZQKXx1',
         state.newPostContent, DateTime.now());
+  }
+
+  Future<void> likeButtonPressed(String id) {
+    return postsRepo.like(id);
+  }
+
+  Future<bool> isLiked(String id) {
+    return postsRepo.isLiked(id);
   }
 }
 

@@ -166,7 +166,6 @@ class HSLogo extends HookWidget {
       }
     };
     final bouncingStatusListener = (AnimationStatus status) {
-      print('hellooooo');
       if (status == AnimationStatus.completed) {
         bouncingAnimationController.reverse();
       } else if (status == AnimationStatus.dismissed) {
