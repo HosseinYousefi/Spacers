@@ -3,14 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hive/hive.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:hs_app/presentation/post/post_view.dart';
 import 'package:yeet/yeet.dart';
 
 import 'application/auth/auth_bloc.dart';
-import 'presentation/animation_page.dart';
-import 'presentation/home/home_view.dart';
 import 'presentation/auth/auth_view.dart';
-import 'presentation/paint_page.dart';
+import 'presentation/home/home_view.dart';
+import 'presentation/post/post_view.dart';
+import 'presentation/username/username_view.dart';
 
 final firebaseProvider =
     FutureProvider((_) async => await Firebase.initializeApp());
@@ -26,28 +25,33 @@ final yeetProvider = Provider<Yeet>((ref) {
     return Yeet(path: '/', builder: (_, __) => Scaffold());
   final authState = ref.watch(authBlocProvider.state);
   return authState.maybeWhen(
-    authenticated: (user) => Yeet(
-      children: [
-        Yeet(
-          path: '/',
-          builder: (_, __) => HomeView(),
-          children: [
-            Yeet.custom(
-              path: '/post/:id',
-              builder: (params, _) => PostView(params['id']!),
-              opaque: false,
-              transitionsBuilder:
-                  (context, animation, secondaryAnimation, child) {
-                return FadeTransition(
-                  opacity: animation,
-                  child: child,
-                );
-              },
-            ),
-          ],
-        ),
-      ],
-    ),
+    authenticated: (user) {
+      if (user.name == '') {
+        return Yeet(path: '/', builder: (_, __) => UsernameView());
+      }
+      return Yeet(
+        children: [
+          Yeet(
+            path: '/',
+            builder: (_, __) => HomeView(),
+            children: [
+              Yeet.custom(
+                path: '/post/:id',
+                builder: (params, _) => PostView(params['id']!),
+                opaque: false,
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
+                  return FadeTransition(
+                    opacity: animation,
+                    child: child,
+                  );
+                },
+              ),
+            ],
+          ),
+        ],
+      );
+    },
     orElse: () => Yeet(
       children: [
         Yeet(
@@ -64,7 +68,7 @@ class MyApp extends HookWidget {
   Widget build(BuildContext context) {
     final yeet = useProvider(yeetProvider);
     return MaterialApp.router(
-      title: 'Harbour.Space',
+      title: 'Spacers',
       theme: ThemeData(
         primarySwatch: Colors.deepPurple,
         // textTheme: GoogleFonts.poppinsTextTheme(),

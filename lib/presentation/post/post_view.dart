@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:hs_app/application/posts/posts_bloc.dart';
+import 'package:hs_app/presentation/home/home_view.dart';
 import 'package:yeet/yeet.dart';
+
+import '../../application/posts/posts_bloc.dart';
 
 class PostView extends HookWidget {
   final String id;
@@ -21,32 +23,7 @@ class PostView extends HookWidget {
           padding: const EdgeInsets.all(100.0),
           child: GestureDetector(
             onTap: () {},
-            child: Hero(
-              tag: 'post $id',
-              child: Card(
-                elevation: 5,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Center(
-                    child: Column(
-                      children: [
-                        Text(
-                          post.authorName,
-                          style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(height: 20),
-                        Text(
-                          post.content,
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.w400),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
+            child: PostWidget(post: post),
           ),
         ),
       ),

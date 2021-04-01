@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:hs_app/application/auth/auth_bloc.dart';
-import 'package:hs_app/application/auth/auth_state.dart';
-import 'package:hs_app/infrastructure/db/firestore.dart';
 
+import '../../application/auth/auth_bloc.dart';
+import '../../application/auth/auth_state.dart';
+import '../../infrastructure/db/firestore.dart';
 import 'post.dart';
 
 class PostsRepo {

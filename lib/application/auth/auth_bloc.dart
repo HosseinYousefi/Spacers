@@ -5,11 +5,16 @@ import '../../domain/auth/user.dart';
 import 'auth_state.dart';
 
 class AuthBloc extends StateNotifier<AuthState> {
-  final AuthState authState;
-
-  AuthBloc({
-    required this.authState,
-  }) : super(authState);
+  final AuthRepo _authRepo;
+  AuthBloc(this._authRepo) : super(AuthState.loading()) {
+    _authRepo.authStateChanges().listen((event) {
+      if (event == null) {
+        state = AuthState.unauthenticated();
+      } else {
+        state = AuthState.authenticated(user: event);
+      }
+    });
+  }
 }
 
 final authChangesProvider = StreamProvider<User?>((ref) {
@@ -18,13 +23,6 @@ final authChangesProvider = StreamProvider<User?>((ref) {
 });
 
 final authBlocProvider = StateNotifierProvider<AuthBloc>((ref) {
-  final user = ref.watch(authChangesProvider);
-  return user.when(
-    data: (data) => AuthBloc(
-        authState: data == null
-            ? AuthState.unauthenticated()
-            : AuthState.authenticated(user: data)),
-    loading: () => AuthBloc(authState: AuthState.loading()),
-    error: (_, __) => AuthBloc(authState: AuthState.unauthenticated()),
-  );
+  final authRepo = ref.watch(authRepoProvider);
+  return AuthBloc(authRepo);
 });

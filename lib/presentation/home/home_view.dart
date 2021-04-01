@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:yeet/yeet.dart';
 
 import '../../application/posts/posts_bloc.dart';
@@ -22,7 +24,7 @@ class HomeView extends HookWidget {
             },
           ),
         ],
-        title: Text('Harbour.Space App'),
+        title: Text('Spacers'),
       ),
       body: LayoutBuilder(
         builder: (context, constraints) {
@@ -81,7 +83,7 @@ class FeedWidget extends HookWidget {
         ),
         SizedBox(height: 16),
         if (state.posts.isEmpty)
-          CircularProgressIndicator()
+          Center(child: CircularProgressIndicator())
         else
           Column(
             children: state.posts.map((e) => PostWidget(post: e)).toList(),
@@ -116,15 +118,19 @@ class PostWidget extends HookWidget {
                 child: Column(
                   children: [
                     Text(
-                      post.authorName,
+                      '@${post.authorName}',
                       style:
                           TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                     SizedBox(height: 20),
-                    Text(
-                      post.content,
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
+                    MarkdownBody(
+                      data: post.content,
+                      onTapLink: (text, href, title) async {
+                        if (href == null) return;
+                        if (await canLaunch(href)) {
+                          await launch(href);
+                        }
+                      },
                     ),
                     Row(
                       children: [

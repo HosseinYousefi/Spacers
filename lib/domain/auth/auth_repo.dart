@@ -1,19 +1,30 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:hs_app/domain/auth/auth_failure.dart';
-import 'package:hs_app/infrastructure/auth/firebase_auth_service.dart';
+import 'package:rxdart/rxdart.dart';
 
+import '../../infrastructure/auth/firebase_auth_service.dart';
+import '../../infrastructure/db/firestore.dart';
+import 'auth_failure.dart';
 import 'user.dart';
 
 extension FirestoreX on firebase_auth.User {
-  String get name => email!.split('@').first;
+  String get name => displayName ?? '';
 }
 
 class AuthRepo {
   final firebase_auth.FirebaseAuth firebaseAuth;
+  final FirebaseFirestore firestore;
+  final StreamController<String> controller;
 
-  AuthRepo(this.firebaseAuth);
+  AuthRepo(this.firebaseAuth, this.firestore) : controller = StreamController();
+
+  void nameAdded(String name) {
+    controller.add(name);
+  }
 
   Future<Either<AuthFailure, User>> register(
     String email,
@@ -61,12 +72,23 @@ class AuthRepo {
   }
 
   Stream<User?> authStateChanges() {
-    return firebaseAuth.authStateChanges().map(
-        (user) => user == null ? null : User(id: user.uid, name: user.name));
+    return Rx.merge([
+      firebaseAuth.authStateChanges().map(
+          (user) => user == null ? null : User(id: user.uid, name: user.name)),
+      controller.stream.map(
+        (event) => firebaseAuth.currentUser == null
+            ? null
+            : User(
+                id: firebaseAuth.currentUser!.uid,
+                name: firebaseAuth.currentUser!.displayName ?? event,
+              ),
+      ),
+    ]);
   }
 }
 
 final authRepoProvider = Provider<AuthRepo>((ref) {
   final firebaseAuth = ref.watch(firebaseAuthProvider);
-  return AuthRepo(firebaseAuth);
+  final firestore = ref.watch(firestoreProvider);
+  return AuthRepo(firebaseAuth, firestore);
 });
