@@ -1,7 +1,10 @@
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:hs_app/presentation/new_post/new_post_view.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:yeet/yeet.dart';
 
@@ -13,56 +16,36 @@ class HomeView extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final authRepo = useProvider(authRepoProvider);
-    final postsBloc = useProvider(postsBlocProvider);
     return Scaffold(
-      appBar: AppBar(
-        actions: [
-          IconButton(
-            icon: Icon(Icons.logout),
-            onPressed: () {
-              authRepo.logout();
-            },
-          ),
-        ],
-        title: Text('Spacers'),
+      floatingActionButton: OpenContainer(
+        closedBuilder: (context, action) => FloatingActionButton(
+          onPressed: null,
+          child: Icon(Icons.post_add),
+        ),
+        openBuilder: (context, action) => NewPostView(),
+        closedShape: CircleBorder(),
+        openShape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
       ),
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          return SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 20.0,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(height: 36),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          onChanged: (value) {
-                            postsBloc.postContentChanged(value);
-                          },
-                          decoration: InputDecoration(hintText: 'Post'),
-                        ),
-                      ),
-                      SizedBox(height: 36),
-                      IconButton(
-                        icon: Icon(Icons.send),
-                        onPressed: () {
-                          postsBloc.postButtonPressed();
-                        },
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 36),
-                  FeedWidget(),
-                ],
-              ),
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            actions: [
+              IconButton(icon: Icon(Icons.logout), onPressed: authRepo.logout),
+            ],
+            leading: IconButton(
+              icon: Icon(Icons.settings),
+              onPressed: () => context.yeet('/settings'),
             ),
-          );
-        },
+            expandedHeight: 120,
+            flexibleSpace: FlexibleSpaceBar(
+              centerTitle: true,
+              title: SvgPicture.asset('logo-white.svg'),
+            ),
+            floating: true,
+            pinned: true,
+          ),
+          FeedWidget(),
+        ],
       ),
     );
   }
@@ -74,21 +57,18 @@ class FeedWidget extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final state = useProvider(postsBlocProvider.state);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Latest Feed',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
-        SizedBox(height: 16),
-        if (state.posts.isEmpty)
-          Center(child: CircularProgressIndicator())
-        else
-          Column(
-            children: state.posts.map((e) => PostWidget(post: e)).toList(),
-          ),
-      ],
+    return SliverList(
+      delegate: SliverChildBuilderDelegate(
+        (context, index) => (state.posts.isEmpty
+            ? Center(
+                child: SizedBox(
+                  height: 200,
+                  child: Center(child: CircularProgressIndicator()),
+                ),
+              )
+            : PostWidget(post: state.posts[index])),
+        childCount: state.posts.isEmpty ? 1 : state.posts.length,
+      ),
     );
   }
 }

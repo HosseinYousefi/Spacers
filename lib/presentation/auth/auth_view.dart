@@ -3,11 +3,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:yeet/yeet.dart';
 
 import '../../application/auth/auth_bloc.dart';
 import '../../application/auth/login_bloc.dart';
 import '../../common/hs_colors.dart';
+import '../common/buttons.dart';
 
 class AuthView extends HookWidget {
   @override
@@ -23,80 +23,98 @@ class AuthView extends HookWidget {
     }, []);
     return Scaffold(
       body: SafeArea(
-        child: Column(
-          children: [
-            HSLogo(
-              controller: loginBloc.hsLogoController,
-            ),
-            authState.when(
-              loading: () => Center(child: CircularProgressIndicator()),
-              authenticated: (user) {
-                return Container();
-              },
-              unauthenticated: () => Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(24.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      TextField(
-                        onChanged: (value) {
-                          loginBloc.emailChanged(value);
-                        },
-                        decoration: InputDecoration(
-                          errorText: loginState.emailError,
-                          border: OutlineInputBorder(),
-                          hintText: 'Email',
-                        ),
-                      ),
-                      SizedBox(height: 24),
-                      TextField(
-                        obscureText: true,
-                        onChanged: (value) {
-                          loginBloc.passwordChanged(value);
-                        },
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(),
-                          hintText: 'Password',
-                          errorText: loginState.passwordError,
-                        ),
-                      ),
-                      SizedBox(height: 24),
-                      ElevatedButton(
-                        onPressed: () {
-                          loginBloc.loginPressed();
-                        },
-                        style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.resolveWith(
-                            (_) => HSColors.mainColor,
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              HSLogo(
+                controller: loginBloc.hsLogoController,
+              ),
+              authState.when(
+                loading: () => Center(child: CircularProgressIndicator()),
+                authenticated: (user) {
+                  return Container();
+                },
+                unauthenticated: () => Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(maxWidth: 500),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          TextField(
+                            onChanged: (value) {
+                              loginBloc.emailChanged(value);
+                            },
+                            keyboardType: TextInputType.emailAddress,
+                            decoration: InputDecoration(
+                              errorText: loginState.emailError,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(100),
+                              ),
+                              hintText: 'Email',
+                            ),
                           ),
-                        ),
-                        child: Text('Sign in'),
-                      ),
-                      SizedBox(height: 24),
-                      ElevatedButton(
-                        onPressed: () {
-                          loginBloc.registerPressed();
-                        },
-                        style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.resolveWith(
-                            (_) => HSColors.mainColor,
+                          SizedBox(height: 24),
+                          TextField(
+                            obscureText: true,
+                            keyboardType: TextInputType.visiblePassword,
+                            onChanged: (value) {
+                              loginBloc.passwordChanged(value);
+                            },
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(100),
+                              ),
+                              hintText: 'Password',
+                              errorText: loginState.passwordError,
+                            ),
                           ),
-                        ),
-                        child: Text('Register'),
+                          SizedBox(height: 24),
+                          HSPrimaryButton(
+                            onPressed: () {
+                              loginBloc.loginPressed();
+                            },
+                            child: Text('SIGN IN'),
+                          ),
+                          SizedBox(height: 24),
+                          HSSecondaryButton(
+                            onPressed: () {
+                              loginBloc.registerPressed();
+                            },
+                            child: Text('REGISTER'),
+                          ),
+                          // SizedBox(height: 24),
+                          // TextButton(
+                          //   onPressed: () {
+                          //     context.yeet('/reset-pass');
+                          //   },
+                          //   child: Text('Forgot password?'),
+                          // ),
+                          SizedBox(height: 40),
+                          DefaultTextStyle(
+                            style: TextStyle(fontSize: 11, color: Colors.grey),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text('Made with '),
+                                Icon(
+                                  Icons.favorite,
+                                  color: Colors.deepPurple,
+                                  size: 11,
+                                ),
+                                Text(' by Hossein Yousefi'),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
-                      SizedBox(height: 24),
-                      TextButton(
-                          onPressed: () {
-                            context.yeet('/reset-pass');
-                          },
-                          child: Text('Forgot password?'))
-                    ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

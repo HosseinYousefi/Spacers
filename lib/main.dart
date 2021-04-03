@@ -6,8 +6,10 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:yeet/yeet.dart';
 
 import 'application/auth/auth_bloc.dart';
+import 'presentation/404/view404.dart';
 import 'presentation/auth/auth_view.dart';
 import 'presentation/home/home_view.dart';
+import 'presentation/new_post/new_post_view.dart';
 import 'presentation/post/post_view.dart';
 import 'presentation/username/username_view.dart';
 
@@ -22,12 +24,28 @@ void main() async {
 final yeetProvider = Provider<Yeet>((ref) {
   final firebase = ref.watch(firebaseProvider);
   if (firebase.data == null)
-    return Yeet(path: '/', builder: (_, __) => Scaffold());
+    return Yeet(
+      children: [
+        Yeet(path: '/', builder: (_, __) => Scaffold()),
+        Yeet(
+          path: ':_(.*)',
+          builder: (_, __) => View404(),
+        ),
+      ],
+    );
   final authState = ref.watch(authBlocProvider.state);
   return authState.maybeWhen(
     authenticated: (user) {
       if (user.name == '') {
-        return Yeet(path: '/', builder: (_, __) => UsernameView());
+        return Yeet(
+          children: [
+            Yeet(path: '/', builder: (_, __) => UsernameView()),
+            Yeet(
+              path: ':_(.*)',
+              builder: (_, __) => View404(),
+            ),
+          ],
+        );
       }
       return Yeet(
         children: [
@@ -49,6 +67,10 @@ final yeetProvider = Provider<Yeet>((ref) {
               ),
             ],
           ),
+          Yeet(
+            path: ':_(.*)',
+            builder: (_, __) => View404(),
+          ),
         ],
       );
     },
@@ -57,6 +79,10 @@ final yeetProvider = Provider<Yeet>((ref) {
         Yeet(
           path: '/',
           builder: (_, __) => AuthView(),
+        ),
+        Yeet(
+          path: ':_(.*)',
+          builder: (_, __) => View404(),
         ),
       ],
     ),
@@ -71,6 +97,7 @@ class MyApp extends HookWidget {
       title: 'Spacers',
       theme: ThemeData(
         primarySwatch: Colors.deepPurple,
+        fontFamily: 'Apercu Pro',
         // textTheme: GoogleFonts.poppinsTextTheme(),
       ),
       routeInformationParser: YeetInformationParser(),
